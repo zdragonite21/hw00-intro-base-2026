@@ -3,9 +3,9 @@ import Drawable from "../rendering/gl/Drawable";
 import { gl } from "../globals";
 
 class Cube extends Drawable {
-  indices: Uint32Array;
-  positions: Float32Array;
-  normals: Float32Array;
+  indices!: Uint32Array;
+  positions!: Float32Array;
+  normals!: Float32Array;
   center: vec4;
 
   constructor(
