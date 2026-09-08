@@ -8,6 +8,7 @@ import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
 import Camera from './Camera';
 import {setGL} from './globals';
 import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
+import {vec4} from 'gl-matrix';
 
 import lambertVertSource from './shaders/lambert-vert.glsl?raw';
 import lambertFragSource from './shaders/lambert-frag.glsl?raw';
@@ -32,6 +33,16 @@ function loadScene() {
   square.create();
   cube = new Cube(vec3.fromValues(0, 0, 0));
   cube.create();
+}
+
+function hexToRGB(hex: string): [number, number, number] {
+  hex = hex.replace('#', '');
+
+  const red = parseInt(hex.slice(0, 2), 16) / 255;
+  const green = parseInt(hex.slice(2, 4), 16) / 255;
+  const blue = parseInt(hex.slice(4, 6), 16) / 255;
+
+  return [red, green, blue];
 }
 
 function main() {
@@ -85,11 +96,14 @@ function main() {
       icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, prevTesselations);
       icosphere.create();
     }
+
+    let color_rgb = hexToRGB(controls.color);
     renderer.render(camera, lambert, [
       // icosphere,
       cube,
       // square,
-    ]);
+    ],
+    vec4.fromValues(color_rgb[0],color_rgb[1], color_rgb[2], 1.0));
     stats.end();
 
     // Tell the browser to call `tick` again whenever it renders a new frame
