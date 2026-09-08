@@ -1,5 +1,8 @@
 #version 300 es
 
+precision highp float;
+precision highp int;
+
 //This is a vertex shader. While it is called a "shader" due to outdated conventions, this file
 //is used to apply matrix transformations to the arrays of vertex data passed to it.
 //Since this code is run on your GPU, each vertex is transformed simultaneously.
@@ -18,6 +21,7 @@ uniform mat4 u_ModelInvTr;  // The inverse transpose of the model matrix.
 uniform mat4 u_ViewProj;    // The matrix that defines the camera's transformation.
                             // We've written a static matrix for you to use for HW2,
                             // but in HW3 you'll have to generate one yourself
+uniform int u_Frame;
 
 in vec4 vs_Pos;             // The array of vertex positions passed to the shader
 
@@ -44,12 +48,14 @@ void main()
                                                             // perpendicular to the surface after the surface is transformed by
                                                             // the model matrix.
 
-
-    vec4 modelposition = u_Model * vs_Pos;   // Temporarily store the transformed vertex positions for use below
+    vec4 pos = vs_Pos;
+    pos.w *= sin(float(u_Frame) / 100.0) * 0.1 + 0.8;
+    
+    vec4 modelposition = u_Model * pos;   // Temporarily store the transformed vertex positions for use below
 
     fs_LightVec = lightPos - modelposition;  // Compute the direction in which the light source lies
 
-    fs_Pos = vs_Pos;
+    fs_Pos = pos;
 
     gl_Position = u_ViewProj * modelposition;// gl_Position is a built-in variable of OpenGL which is
                                              // used to render the final positions of the geometry's vertices

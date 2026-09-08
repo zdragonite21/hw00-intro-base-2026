@@ -10,8 +10,10 @@
 // can compute what color to apply to its pixel based on things like vertex
 // position, light position, and vertex color.
 precision highp float;
+precision highp int;
 
 uniform vec4 u_Color; // The color with which to render this instance of geometry.
+uniform int u_Frame;
 
 // These are the interpolated values out of the rasterizer, so you can't know
 // their specific values without knowing the vertices that contributed to them
@@ -79,6 +81,6 @@ void main() {
     // Compute final shaded color
     out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
 
-    vec3 color = Voronoi3D(fs_Pos.xyz, 2.0);
+    vec3 color = Voronoi3D(fs_Pos.xyz + vec3(sin(float(u_Frame) / 100.0) * 0.5 + 0.5), 2.0);
     out_Col = vec4(color, 1.0);
 }

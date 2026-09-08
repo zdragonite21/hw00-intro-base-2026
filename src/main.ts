@@ -17,8 +17,8 @@ import lambertFragSource from './shaders/lambert-frag.glsl?raw';
 // This will be referred to by dat.GUI's functions that add GUI elements.
 const controls = {
   tesselations: 5,
-  color: '#FF0000',
-  'Load Scene': loadScene, // A function pointer, essentially
+  color: "#FF0000",
+  "Load Scene": loadScene, // A function pointer, essentially
 };
 
 let icosphere: Icosphere;
@@ -36,7 +36,7 @@ function loadScene() {
 }
 
 function hexToRGB(hex: string): [number, number, number] {
-  hex = hex.replace('#', '');
+  hex = hex.replace("#", "");
 
   const red = parseInt(hex.slice(0, 2), 16) / 255;
   const green = parseInt(hex.slice(2, 4), 16) / 255;
@@ -49,22 +49,22 @@ function main() {
   // Initial display for framerate
   const stats = Stats();
   stats.setMode(0);
-  stats.domElement.style.position = 'absolute';
-  stats.domElement.style.left = '0px';
-  stats.domElement.style.top = '0px';
+  stats.domElement.style.position = "absolute";
+  stats.domElement.style.left = "0px";
+  stats.domElement.style.top = "0px";
   document.body.appendChild(stats.domElement);
 
   // Add controls to the gui
   const gui = new DAT.GUI();
-  gui.add(controls, 'tesselations', 0, 8).step(1);
-  gui.addColor(controls, 'color');
-  gui.add(controls, 'Load Scene');
+  gui.add(controls, "tesselations", 0, 8).step(1);
+  gui.addColor(controls, "color");
+  gui.add(controls, "Load Scene");
 
   // get canvas and webgl context
-  const canvas = <HTMLCanvasElement> document.getElementById('canvas');
-  const gl = <WebGL2RenderingContext> canvas.getContext('webgl2');
+  const canvas = <HTMLCanvasElement>document.getElementById("canvas");
+  const gl = <WebGL2RenderingContext>canvas.getContext("webgl2");
   if (!gl) {
-    alert('WebGL 2 not supported!');
+    alert("WebGL 2 not supported!");
   }
   // `setGL` is a function imported above which sets the value of `gl` in the `globals.ts` module.
   // Later, we can import `gl` from `globals.ts` to access it
@@ -84,37 +84,49 @@ function main() {
     new Shader(gl.FRAGMENT_SHADER, lambertFragSource),
   ]);
 
+  let frame = 0;
+
   // This function will be called every frame
   function tick() {
     camera.update();
     stats.begin();
     gl.viewport(0, 0, window.innerWidth, window.innerHeight);
     renderer.clear();
-    if(controls.tesselations != prevTesselations)
-    {
+    if (controls.tesselations != prevTesselations) {
       prevTesselations = controls.tesselations;
       icosphere = new Icosphere(vec3.fromValues(0, 0, 0), 1, prevTesselations);
       icosphere.create();
     }
 
     let color_rgb = hexToRGB(controls.color);
-    renderer.render(camera, lambert, [
-      // icosphere,
-      cube,
-      // square,
-    ],
-    vec4.fromValues(color_rgb[0],color_rgb[1], color_rgb[2], 1.0));
+    renderer.render(
+      camera,
+      lambert,
+      [
+        // icosphere,
+        cube,
+        // square,
+      ],
+      vec4.fromValues(color_rgb[0], color_rgb[1], color_rgb[2], 1.0),
+      frame,
+    );
     stats.end();
+
+    frame++;
 
     // Tell the browser to call `tick` again whenever it renders a new frame
     requestAnimationFrame(tick);
   }
 
-  window.addEventListener('resize', function() {
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.setAspectRatio(window.innerWidth / window.innerHeight);
-    camera.updateProjectionMatrix();
-  }, false);
+  window.addEventListener(
+    "resize",
+    function () {
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      camera.setAspectRatio(window.innerWidth / window.innerHeight);
+      camera.updateProjectionMatrix();
+    },
+    false,
+  );
 
   renderer.setSize(window.innerWidth, window.innerHeight);
   camera.setAspectRatio(window.innerWidth / window.innerHeight);
