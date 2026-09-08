@@ -1,17 +1,17 @@
-import {vec3} from 'gl-matrix';
-import Stats from 'stats-js';
-import * as DAT from 'dat.gui';
-import Icosphere from './geometry/Icosphere';
-import Square from './geometry/Square';
-import Cube from './geometry/Cube';
-import OpenGLRenderer from './rendering/gl/OpenGLRenderer';
-import Camera from './Camera';
-import {setGL} from './globals';
-import ShaderProgram, {Shader} from './rendering/gl/ShaderProgram';
-import {vec4} from 'gl-matrix';
+import { vec3 } from "gl-matrix";
+import Stats from "stats-js";
+import * as DAT from "dat.gui";
+import Icosphere from "./geometry/Icosphere";
+import Square from "./geometry/Square";
+import Cube from "./geometry/Cube";
+import OpenGLRenderer from "./rendering/gl/OpenGLRenderer";
+import Camera from "./Camera";
+import { setGL } from "./globals";
+import ShaderProgram, { Shader } from "./rendering/gl/ShaderProgram";
+import { vec4 } from "gl-matrix";
 
-import lambertVertSource from './shaders/lambert-vert.glsl?raw';
-import lambertFragSource from './shaders/lambert-frag.glsl?raw';
+import lambertVertSource from "./shaders/lambert-vert.glsl?raw";
+import lambertFragSource from "./shaders/lambert-frag.glsl?raw";
 
 // Define an object with application parameters and button callbacks
 // This will be referred to by dat.GUI's functions that add GUI elements.
