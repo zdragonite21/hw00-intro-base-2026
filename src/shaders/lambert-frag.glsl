@@ -18,26 +18,67 @@ uniform vec4 u_Color; // The color with which to render this instance of geometr
 in vec4 fs_Nor;
 in vec4 fs_LightVec;
 in vec4 fs_Col;
+in vec4 fs_Pos;
 
 out vec4 out_Col; // This is the final output color that you will see on your
                   // screen for the pixel that is currently being processed.
 
-void main()
-{
+vec3 random3(vec3 p) {
+    return fract(sin(vec3(dot(p,vec3(127.1, 311.7, 51.2)),
+                        dot(p,vec3(269.5, 183.3, 198.5)),
+                        dot(p, vec3(420.6, 631.2, 998.9))
+                        )) * 43758.5453);
+
+}
+
+// minkowski distance voronoi
+vec3 Voronoi3D(vec3 uv, float scale) {
+    float exp = 100000.f;
+    uv *= scale; // Now the space is 10x10 instead of 1x1. Change this to any number you want.
+    vec3 uvInt = floor(uv);
+    vec3 uvFract = fract(uv);
+
+    float minDist = 1.0; // Minimum distance initialized to max.
+    vec3 closestSeedPoint = uv;
+    for(int z = -1; z <= 1; ++z) {
+        for(int y = -1; y <= 1; ++y) {
+            for(int x = -1; x <= 1; ++x) {
+                vec3 neighbor = vec3(float(x), float(y), float(z)); // Direction in which neighbor cell lies
+                vec3 point = random3(uvInt + neighbor); // Get the Voronoi centerpoint for the neighboring cell
+                vec3 diff = neighbor + point - uvFract; // Distance between fragment coord and neighbor’s Voronoi point
+
+                vec3 d = pow(abs(diff), vec3(exp));
+                float dist = pow(dot(d,vec3(1.f)), 1.f/exp);
+
+                if (dist < minDist) {
+                    minDist = dist;
+                    closestSeedPoint = point + neighbor + uvInt;
+                }
+            }
+        }
+    }
+    // return texture(u_Texture, closestSeedPoint / scale);
+    return closestSeedPoint / scale;
+}
+
+void main() {
     // Material base color (before shading)
-        vec4 diffuseColor = u_Color;
+    vec4 diffuseColor = u_Color;
 
-        // Calculate the diffuse term for Lambert shading
-        float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
-        // Avoid negative lighting values
-        // diffuseTerm = clamp(diffuseTerm, 0, 1);
+    // Calculate the diffuse term for Lambert shading
+    float diffuseTerm = dot(normalize(fs_Nor), normalize(fs_LightVec));
+    // Avoid negative lighting values
+    // diffuseTerm = clamp(diffuseTerm, 0, 1);
 
-        float ambientTerm = 0.2;
+    float ambientTerm = 0.2;
 
-        float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier
+    float lightIntensity = diffuseTerm + ambientTerm;   //Add a small float value to the color multiplier
                                                             //to simulate ambient lighting. This ensures that faces that are not
                                                             //lit by our point light are not completely black.
 
-        // Compute final shaded color
-        out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
+    // Compute final shaded color
+    out_Col = vec4(diffuseColor.rgb * lightIntensity, diffuseColor.a);
+
+    vec3 color = Voronoi3D(fs_Pos.xyz, 2.0);
+    out_Col = vec4(color, 1.0);
 }
